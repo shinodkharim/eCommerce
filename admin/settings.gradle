@@ -1,0 +1,3 @@
+rootProject.name = 'admin'
+//include ':base'
+//project(':base').projectDir = new File(settingsDir, '../base')
