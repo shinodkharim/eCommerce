@@ -1,10 +1,13 @@
 package com.curiez.admin.service;
 
-import com.curiez.admin.dto.ProductDTO;
+import com.curiez.admin.dto.CatalogDTO;
+import com.curiez.admin.dto.SkuDTO;
 import com.curiez.admin.exception.ItemExists;
 import com.curiez.admin.exception.ItemNotFound;
-import com.curiez.admin.model.Product;
-import com.curiez.admin.repository.ProductRepository;
+import com.curiez.admin.model.Catalog;
+import com.curiez.admin.model.Sku;
+import com.curiez.admin.repository.CatalogRepository;
+import com.curiez.admin.repository.SkuRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -17,20 +20,20 @@ import reactor.test.StepVerifier;
 @ExtendWith(SpringExtension.class)
 @Tag("UNIT")
 @Tag("SERVICE")
-class ProductServiceTest {
-    ProductDTO dto;
-    Product entity;
+class CatalogServiceTest {
 
+    private Catalog entity;
+    private CatalogDTO dto;
     @Mock
-    private ProductRepository repository;
 
+    private CatalogRepository repository;
     @InjectMocks
-    private ProductService service;
+    private CatalogService service;
 
     @BeforeEach
     void setUp() {
-         entity = Product.builder().id("P1").name("Name").description("Description").build();
-         dto = ProductDTO.builder().id("P1").name("Name").description("Description").build();
+        entity = Catalog.builder().id("P1").name("Name").description("Description").build();
+        dto = CatalogDTO.builder().id("P1").name("Name").description("Description").build();
     }
 
     @AfterEach
@@ -39,8 +42,8 @@ class ProductServiceTest {
 
 
     @Test
-    @DisplayName("Create or Save the Product and return Mono of ProductDTO")
-    public void saveProduct(){
+    @DisplayName("Create or Save the SKU and return Mono of ProductDTO")
+    public void saveCatalog(){
         BDDMockito
                 .given(repository.save(entity))
                 .willReturn(Mono.just(entity));
@@ -58,8 +61,8 @@ class ProductServiceTest {
 
 
     @Test
-    @DisplayName("Create the Product and return Mono of ProductDTO")
-    public void createProduct(){
+    @DisplayName("Create the Catalog and return Mono of Catalog DTO")
+    public void createSku(){
         BDDMockito
                 .given(repository.save(entity))
                 .willReturn(Mono.just(entity));
@@ -80,8 +83,8 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("Create the Product when exits throws ItemExists")
-    public void createProduct_when_exists(){
+    @DisplayName("Create the Catalog when exits throws ItemExists")
+    public void createCatalog_when_exists(){
         BDDMockito
                 .given(repository.save(entity))
                 .willReturn(Mono.just(entity));
@@ -105,9 +108,9 @@ class ProductServiceTest {
 
 
     @Test
-    @DisplayName("Get Product by an invalid ID returns ItemNotFound")
-    public void getProduct_when_not_exists(){
-        entity = Product.builder().id("P1").name("Name").description("Description").build();
+    @DisplayName("Get Catalog by an invalid ID returns ItemNotFound")
+    public void getCatalog_when_not_exists(){
+        entity = Catalog.builder().id("P1").name("Name").description("Description").build();
         BDDMockito
                 .given(repository.findById("INVALID_ID"))
                 .willReturn(Mono.empty());
@@ -123,8 +126,8 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("Get Product by ID returns Mono of Product DTO")
-    public void getProduct(){
+    @DisplayName("Get Catalog by ID returns Mono of Catalog  DTO")
+    public void getCatalog(){
 
         BDDMockito
                 .given(repository.findById("P1"))
@@ -142,22 +145,23 @@ class ProductServiceTest {
 
 
     @Test
-    @DisplayName("Partial update product and returns Mono of ProductDTO")
-    public void updateProduct(){
-        Product productUpdated = Product.builder().id("P1").name("New_Name").description("Description").build();
-        ProductDTO changeProductDTO = ProductDTO.builder().id("P1").name("New_Name").build();
-        ProductDTO updatedProductDTO = ProductDTO.builder().id("P1").name("New_Name").description("Description").build();
-        BDDMockito.given(repository.findById("P1"))
-                        .willReturn(Mono.just(entity));
+    @DisplayName("Partial update Catalog and returns Mono of Catalog DTO")
+    public void updateCatalog(){
+        Catalog catalog = Catalog.builder().id("S1").name("New_Name").description("Description").build();
+        CatalogDTO catalogDto = CatalogDTO.builder().id("S1").name("New_Name").build();
+        CatalogDTO updatedCatalogDto = CatalogDTO.builder().id("S1").name("New_Name").description("Description").build();
+
+        BDDMockito.given(repository.findById("S1"))
+                .willReturn(Mono.just(entity));
 
         BDDMockito
-                .given(repository.save(productUpdated))
-                .willReturn(Mono.just(productUpdated));
+                .given(repository.save(catalog))
+                .willReturn(Mono.just(catalog));
 
-        StepVerifier.create(service.update(changeProductDTO,changeProductDTO.getId()))
-                    .expectSubscription()
-                    .expectNext(updatedProductDTO)
-                    .verifyComplete();
+        StepVerifier.create(service.update(catalogDto,catalogDto.getId()))
+                .expectSubscription()
+                .expectNext(updatedCatalogDto)
+                .verifyComplete();
 
         BDDMockito
                 .verify(repository,BDDMockito.atMost(1))
@@ -166,18 +170,18 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("Partial update invalid product throws ItemNotFound Exception")
-    public void updateProduct_when_not_found(){
-        Product product = Product.builder().id("INVALID_ID").name("New_Name").description("Description").build();
-        ProductDTO productDTO = ProductDTO.builder().id("INVALID_ID").name("New_Name").description("Description").build();
+    @DisplayName("Partial update invalid SKU throws ItemNotFound Exception")
+    public void updateCatalog_when_not_found(){
+        Catalog catalog = Catalog.builder().id("INVALID_ID").name("New_Name").description("Description").build();
+        CatalogDTO catalogDTO = CatalogDTO.builder().id("INVALID_ID").name("New_Name").description("Description").build();
         BDDMockito.given(repository.findById("INVALID_ID"))
                 .willReturn(Mono.empty());
 
         BDDMockito
-                .given(repository.save(product))
-                .willReturn(Mono.just(product));
+                .given(repository.save(catalog))
+                .willReturn(Mono.just(catalog));
 
-        StepVerifier.create(service.update(productDTO,productDTO.getId()))
+        StepVerifier.create(service.update(catalogDTO,catalogDTO.getId()))
                 .expectSubscription()
                 .expectError(ItemNotFound.class)
                 .verify();
@@ -190,8 +194,8 @@ class ProductServiceTest {
 
 
     @Test
-    @DisplayName("Delete the product when not exists throws ItemNotFound")
-    public void deleteProduct(){
+    @DisplayName("Delete the Catalog when not exists throws ItemNotFound")
+    public void deleteCatalog(){
         BDDMockito.given(repository.findById("INVALID_ID"))
                 .willReturn(Mono.empty());
 
@@ -200,12 +204,11 @@ class ProductServiceTest {
 
         StepVerifier.create(service.delete("INVALID_ID"))
                 .expectSubscription()
-                        .expectError(ItemNotFound.class)
-                                .verify();
+                .expectError(ItemNotFound.class)
+                .verify();
         BDDMockito.verify(repository,BDDMockito.atMost(1))
                 .delete(entity);
     }
-
 
 
 }

@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Builder
-public class ProductDTO {
+public class ProductDTO implements DomainDTO {
  private String id;
  private String name;
  private String description;
